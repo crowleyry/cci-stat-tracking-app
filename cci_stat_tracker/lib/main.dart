@@ -26,7 +26,13 @@ class MyApp extends StatelessWidget {
 }
 
 class MyAppState extends ChangeNotifier {
-  var current = WordPair.random();
+  // var current = WordPair.random();  --this was from the codelab
+  
+  // USE THIS AS THE METHOD TO CALL DATABAST, ETC
+  void login() {
+    print('user logged in');
+    notifyListeners();
+  }
 }
 
 class MyHomePage extends StatelessWidget {
@@ -37,8 +43,18 @@ class MyHomePage extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          Text('A random idea:'),
-          Text(appState.current.asLowerCase),
+          Text('Welcome to CCI Stat Tracker!'),
+          Text('Username: '),
+          Text('Password: '),
+
+          // login button
+          ElevatedButton(
+            onPressed: () {
+            print('login pressed!');
+            appState.login();
+          },
+          child: Text('Login'),
+          )
         ],
       ),
     );
