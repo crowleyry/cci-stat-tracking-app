@@ -1,4 +1,4 @@
-import 'package:english_words/english_words.dart';
+// import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -71,7 +71,7 @@ class LoginPage extends StatelessWidget {
 class UpdateStatsPage extends StatelessWidget { // this page is where the team will input their stats while doing evangelism
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
+    // var appState = context.watch<MyAppState>();
 
     return Scaffold(
       body: Column(
