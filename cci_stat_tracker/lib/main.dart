@@ -84,7 +84,7 @@ class UpdateStatsPage extends StatelessWidget { // this page is where the team w
               Text('Partner'),
             ],
           ),
-          Row( // TODO: copy/paste this for each of the other stat categories (maybe make this a widget?)
+          Row( // initiations row
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text('Initiations:'),
@@ -116,9 +116,102 @@ class UpdateStatsPage extends StatelessWidget { // this page is where the team w
               ),
             ],
           ),
-          Text('Spiritual Conversations:'),
-          Text('Gospel Conversations:'),
-          Text('Prayers to Receive Christ:'),
+          Row( // Spiritual convo row
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text('Spiritual Conversations:'),
+              Text('0'),
+              Text('0'),
+              OutlinedButton( // button to increase solo spir convo stat
+                onPressed: () {
+                  print('solo spir convo + pressed');
+                },
+                child: Text('+ Solo'),
+              ),
+              OutlinedButton( // button to decrease solo spir convo stat
+                onPressed: () {
+                  print('solo spir convo - pressed');
+                },
+                child: Text('- Solo'),
+              ),
+              OutlinedButton( // button to increase partner spir convo stat
+                onPressed: () {
+                  print('partner spir convo + pressed');
+                },
+                child: Text('+ Partner'),
+              ),
+              OutlinedButton( // button to decrease partner spir convo stat
+                onPressed: () {
+                  print('partner spir convo - pressed');
+                },
+                child: Text('- Partner'),
+              ),
+            ],
+          ),
+          Row( // Gospel convo row
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text('Gospel Conversations:'),
+              Text('0'),
+              Text('0'),
+              OutlinedButton( // button to increase solo GC stat
+                onPressed: () {
+                  print('solo GC + pressed');
+                },
+                child: Text('+ Solo'),
+              ),
+              OutlinedButton( // button to decrease solo GC stat
+                onPressed: () {
+                  print('solo GC - pressed');
+                },
+                child: Text('- Solo'),
+              ),
+              OutlinedButton( // button to increase partner GC stat
+                onPressed: () {
+                  print('partner GC + pressed');
+                },
+                child: Text('+ Partner'),
+              ),
+              OutlinedButton( // button to decrease partner GC stat
+                onPressed: () {
+                  print('partner GC - pressed');
+                },
+                child: Text('- Partner'),
+              ),
+            ],
+          ),
+          Row( // PRC row
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text('Prayers to Receive Christ:'),
+              Text('0'),
+              Text('0'),
+              OutlinedButton( // button to increase solo PRC stat
+                onPressed: () {
+                  print('solo PRC + pressed');
+                },
+                child: Text('+ Solo'),
+              ),
+              OutlinedButton( // button to decrease solo PRC stat
+                onPressed: () {
+                  print('solo PRC - pressed');
+                },
+                child: Text('- Solo'),
+              ),
+              OutlinedButton( // button to increase partner PRC stat
+                onPressed: () {
+                  print('partner PRC + pressed');
+                },
+                child: Text('+ Partner'),
+              ),
+              OutlinedButton( // button to decrease partner PRC stat
+                onPressed: () {
+                  print('partner PRC - pressed');
+                },
+                child: Text('- Partner'),
+              ),
+            ],
+          ),
           
           // back button to navigate to login page (probably temporary)
           ElevatedButton(
