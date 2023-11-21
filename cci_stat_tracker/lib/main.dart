@@ -85,177 +85,235 @@ class LoginPage extends StatelessWidget {
 class UpdateStatsPage extends StatelessWidget { // this page is where the team will input their stats while doing outreach
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
+    // var appState = context.watch<MyAppState>();
 
-    return Scaffold( // TODO: update this to be a ListTile (so much easier...)
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Row( // row for headers
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text('Solo'),
-              Text('Partner'),
-            ],
-          ),
-          Row( // initiations row
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text('Initiations:'),
-              Text(appState.stats[0].toString()), // solo text
-              Text(appState.stats[1].toString()), // partner text
-              OutlinedButton( // button to increase solo init stat
-                onPressed: () {
-                  appState.incStat(0); // increment init solo
-                  print('solo init + pressed');
-                },
-                child: Text('+ Solo'),
-              ),
-              OutlinedButton( // button to decrease solo init stat
-                onPressed: () {
-                  appState.decStat(0); // decrement init solo
-                  print('solo init - pressed');
-                },
-                child: Text('- Solo'),
-              ),
-              OutlinedButton( // button to increase partner init stat
-                onPressed: () {
-                  appState.incStat(1);
-                  print('partner init + pressed');
-                },
-                child: Text('+ Partner'),
-              ),
-              OutlinedButton( // button to decrease partner init stat
-                onPressed: () {
-                  appState.decStat(1);
-                  print('partner init - pressed');
-                },
-                child: Text('- Partner'),
-              ),
-            ],
-          ),
-          Row( // Spiritual convo row
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text('Spiritual Conversations:'),
-              Text(appState.stats[2].toString()),
-              Text(appState.stats[3].toString()),
-              OutlinedButton( // button to increase solo spir convo stat
-                onPressed: () {
-                  appState.incStat(2);
-                  print('solo spir convo + pressed');
-                },
-                child: Text('+ Solo'),
-              ),
-              OutlinedButton( // button to decrease solo spir convo stat
-                onPressed: () {
-                  appState.decStat(2);
-                  print('solo spir convo - pressed');
-                },
-                child: Text('- Solo'),
-              ),
-              OutlinedButton( // button to increase partner spir convo stat
-                onPressed: () {
-                  appState.incStat(3);
-                  print('partner spir convo + pressed');
-                },
-                child: Text('+ Partner'),
-              ),
-              OutlinedButton( // button to decrease partner spir convo stat
-                onPressed: () {
-                  appState.decStat(3);
-                  print('partner spir convo - pressed');
-                },
-                child: Text('- Partner'),
-              ),
-            ],
-          ),
-          Row( // Gospel convo row
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text('Gospel Conversations:'),
-              Text(appState.stats[4].toString()),
-              Text(appState.stats[5].toString()),
-              OutlinedButton( // button to increase solo GC stat
-                onPressed: () {
-                  appState.incStat(4);
-                  print('solo GC + pressed');
-                },
-                child: Text('+ Solo'),
-              ),
-              OutlinedButton( // button to decrease solo GC stat
-                onPressed: () {
-                  appState.decStat(4);
-                  print('solo GC - pressed');
-                },
-                child: Text('- Solo'),
-              ),
-              OutlinedButton( // button to increase partner GC stat
-                onPressed: () {
-                  appState.incStat(5);
-                  print('partner GC + pressed');
-                },
-                child: Text('+ Partner'),
-              ),
-              OutlinedButton( // button to decrease partner GC stat
-                onPressed: () {
-                  appState.decStat(5);
-                  print('partner GC - pressed');
-                },
-                child: Text('- Partner'),
-              ),
-            ],
-          ),
-          Row( // PRC row
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text('Prayers to Receive Christ:'),
-              Text(appState.stats[6].toString()),
-              Text(appState.stats[7].toString()),
-              OutlinedButton( // button to increase solo PRC stat
-                onPressed: () {
-                  appState.incStat(6);
-                  print('solo PRC + pressed');
-                },
-                child: Text('+ Solo'),
-              ),
-              OutlinedButton( // button to decrease solo PRC stat
-                onPressed: () {
-                  appState.decStat(6);
-                  print('solo PRC - pressed');
-                },
-                child: Text('- Solo'),
-              ),
-              OutlinedButton( // button to increase partner PRC stat
-                onPressed: () {
-                  appState.incStat(7);
-                  print('partner PRC + pressed');
-                },
-                child: Text('+ Partner'),
-              ),
-              OutlinedButton( // button to decrease partner PRC stat
-                onPressed: () {
-                  appState.decStat(7);
-                  print('partner PRC - pressed');
-                },
-                child: Text('- Partner'),
-              ),
-            ],
-          ),
-          
-          // back button to navigate to login page (probably temporary)
-          ElevatedButton(
-            onPressed: () {
-              print('back button pressed');
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => LoginPage()),
-              );
-            },
-            child: Text('Back'),
-          )
-        ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Update Stats")
+      ),
+      body: Center(
+        child: ListView(
+          children: [
+            InitSoloListTile(), InitPartnerListTile(), SCSoloListTile(), SCPartnerListTile(), GCSoloListTile(), GCPartnerListTile(), PRCSoloListTile(), PRCPartnerListTile()
+          ]
+        ),
       )
+    );
+  }
+}
+
+class InitSoloListTile extends StatelessWidget { // listtile for init solo stat
+  const InitSoloListTile({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    return ListTile(
+      leading: IconButton(
+        icon: Icon(Icons.remove),
+        onPressed: () {
+          appState.decStat(0); // decrement init solo
+          print('solo init - pressed');
+        },
+      ),
+      title: Text(appState.stats[0].toString()),
+      subtitle: Text('Initiations Solo'),
+      trailing: IconButton(
+        icon: Icon(Icons.add),
+        onPressed: () {
+          appState.incStat(0); // increment init solo
+          print('solo init + pressed');
+        },
+      ),
+    );
+  }
+}
+
+class InitPartnerListTile extends StatelessWidget { // listtile for init partner stat
+  const InitPartnerListTile({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    return ListTile(
+      leading: IconButton(
+        icon: Icon(Icons.remove),
+        onPressed: () {
+          appState.decStat(1); // decrement init solo
+          print('partner init - pressed');
+        },
+      ),
+      title: Text(appState.stats[1].toString()),
+      subtitle: Text('Initiations with Partner'),
+      trailing: IconButton(
+        icon: Icon(Icons.add),
+        onPressed: () {
+          appState.incStat(1); // increment init solo
+          print('parnter init + pressed');
+        },
+      ),
+    );
+  }
+}
+
+class SCSoloListTile extends StatelessWidget { // listtile for sc solo stat
+  const SCSoloListTile({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    return ListTile(
+      leading: IconButton(
+        icon: Icon(Icons.remove),
+        onPressed: () {
+          appState.decStat(2); // increment init solo
+          print('solo sc - pressed');
+        },
+      ),
+      title: Text(appState.stats[2].toString()),
+      subtitle: Text('Spiritual Conversations Solo'),
+      trailing: IconButton(
+        icon: Icon(Icons.add),
+        onPressed: () {
+          appState.incStat(2); // increment init solo
+          print('solo sc + pressed');
+        },
+      ),
+    );
+  }
+}
+
+class SCPartnerListTile extends StatelessWidget { // listtile for sc partner stat
+  const SCPartnerListTile({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    return ListTile(
+      leading: IconButton(
+        icon: Icon(Icons.remove),
+        onPressed: () {
+          appState.decStat(3); // increment init solo
+          print('partner sc + pressed');
+        },
+      ),
+      title: Text(appState.stats[3].toString()),
+      subtitle: Text('Spiritual Conversations with Partner'),
+      trailing: IconButton(
+        icon: Icon(Icons.add),
+        onPressed: () {
+          appState.incStat(3); // increment init solo
+          print('partner sc + pressed');
+        },
+      ),
+    );
+  }
+}
+
+class GCSoloListTile extends StatelessWidget { // listtile for gc solo stat
+  const GCSoloListTile({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    return ListTile(
+      leading: IconButton(
+        icon: Icon(Icons.remove),
+        onPressed: () {
+          appState.decStat(4); // decrement gc solo
+          print('solo gc + pressed');
+        },
+      ),
+      title: Text(appState.stats[4].toString()),
+      subtitle: Text('Gospel Conversations Solo'),
+      trailing: IconButton(
+        icon: Icon(Icons.add),
+        onPressed: () {
+          appState.incStat(4); // increment gc solo
+          print('solo gc + pressed');
+        },
+      ),
+    );
+  }
+}
+
+class GCPartnerListTile extends StatelessWidget { // listtile for gc partner stat
+  const GCPartnerListTile({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    return ListTile(
+      leading: IconButton(
+        icon: Icon(Icons.remove),
+        onPressed: () {
+          appState.decStat(5); // decrement gc partner
+          print('partner gc - pressed');
+        },
+      ),
+      title: Text(appState.stats[5].toString()),
+      subtitle: Text('Gospel Conversations with Partner'),
+      trailing: IconButton(
+        icon: Icon(Icons.add),
+        onPressed: () {
+          appState.incStat(5); // increment gc partner
+          print('partner gc + pressed');
+        },
+      ),
+    );
+  }
+}
+
+class PRCSoloListTile extends StatelessWidget { // listtile for prc solo stat
+  const PRCSoloListTile({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    return ListTile(
+      leading: IconButton(
+        icon: Icon(Icons.remove),
+        onPressed: () {
+          appState.decStat(6); // decrement prc solo
+          print('solo prc - pressed');
+        },
+      ),
+      title: Text(appState.stats[6].toString()),
+      subtitle: Text('Prayers to Receive Christ Solo'),
+      trailing: IconButton(
+        icon: Icon(Icons.add),
+        onPressed: () {
+          appState.incStat(6); // increment prc solo
+          print('solo prc + pressed');
+        },
+      ),
+    );
+  }
+}
+
+class PRCPartnerListTile extends StatelessWidget { // listtile for prc partner stat
+  const PRCPartnerListTile({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    return ListTile(
+      leading: IconButton(
+        icon: Icon(Icons.remove),
+        onPressed: () {
+          appState.decStat(7); // decrement prc partner
+          print('partner prc - pressed');
+        },
+      ),
+      title: Text(appState.stats[7].toString()),
+      subtitle: Text('Prayers to Receive Christ with Partner'),
+      trailing: IconButton(
+        icon: Icon(Icons.add),
+        onPressed: () {
+          appState.incStat(7); // increment prc partner
+          print('partner prc + pressed');
+        },
+      ),
     );
   }
 }
