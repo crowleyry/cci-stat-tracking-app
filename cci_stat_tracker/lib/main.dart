@@ -1,8 +1,17 @@
 // import 'package:english_words/english_words.dart';
+// DONT WORRY ABOUT DATE RANGES YET, JUST USE THE USER AS THE TOP LEVEL IN THE DATABASE AND GET THINGS READING/WRITING
+// ANGULAR/REACT WEBSITE TO INTERACT WITH DATABASE (JONAH)
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
 
@@ -116,8 +125,8 @@ class InitSoloListTile extends StatelessWidget { // listtile for init solo stat
           print('solo init - pressed');
         },
       ),
-      title: Text(appState.stats[0].toString()),
-      subtitle: Text('Initiations Solo'),
+      title: Center(child: Text(appState.stats[0].toString())),
+      subtitle: Center(child: Text('Initiations Solo')),
       trailing: IconButton(
         icon: Icon(Icons.add),
         onPressed: () {
@@ -143,8 +152,8 @@ class InitPartnerListTile extends StatelessWidget { // listtile for init partner
           print('partner init - pressed');
         },
       ),
-      title: Text(appState.stats[1].toString()),
-      subtitle: Text('Initiations with Partner'),
+      title: Center(child: Text(appState.stats[1].toString())),
+      subtitle: Center(child: Text('Initiations with Partner')),
       trailing: IconButton(
         icon: Icon(Icons.add),
         onPressed: () {
@@ -170,8 +179,8 @@ class SCSoloListTile extends StatelessWidget { // listtile for sc solo stat
           print('solo sc - pressed');
         },
       ),
-      title: Text(appState.stats[2].toString()),
-      subtitle: Text('Spiritual Conversations Solo'),
+      title: Center(child: Text(appState.stats[2].toString())),
+      subtitle: Center(child: Text('Spiritual Conversations Solo')),
       trailing: IconButton(
         icon: Icon(Icons.add),
         onPressed: () {
@@ -197,8 +206,8 @@ class SCPartnerListTile extends StatelessWidget { // listtile for sc partner sta
           print('partner sc + pressed');
         },
       ),
-      title: Text(appState.stats[3].toString()),
-      subtitle: Text('Spiritual Conversations with Partner'),
+      title: Center(child: Text(appState.stats[3].toString())),
+      subtitle: Center(child: Text('Spiritual Conversations with Partner')),
       trailing: IconButton(
         icon: Icon(Icons.add),
         onPressed: () {
@@ -224,8 +233,8 @@ class GCSoloListTile extends StatelessWidget { // listtile for gc solo stat
           print('solo gc + pressed');
         },
       ),
-      title: Text(appState.stats[4].toString()),
-      subtitle: Text('Gospel Conversations Solo'),
+      title: Center(child: Text(appState.stats[4].toString())),
+      subtitle: Center(child: Text('Gospel Conversations Solo')),
       trailing: IconButton(
         icon: Icon(Icons.add),
         onPressed: () {
@@ -251,8 +260,8 @@ class GCPartnerListTile extends StatelessWidget { // listtile for gc partner sta
           print('partner gc - pressed');
         },
       ),
-      title: Text(appState.stats[5].toString()),
-      subtitle: Text('Gospel Conversations with Partner'),
+      title: Center(child: Text(appState.stats[5].toString())),
+      subtitle: Center(child: Text('Gospel Conversations with Partner')),
       trailing: IconButton(
         icon: Icon(Icons.add),
         onPressed: () {
@@ -278,8 +287,8 @@ class PRCSoloListTile extends StatelessWidget { // listtile for prc solo stat
           print('solo prc - pressed');
         },
       ),
-      title: Text(appState.stats[6].toString()),
-      subtitle: Text('Prayers to Receive Christ Solo'),
+      title: Center(child: Text(appState.stats[6].toString())),
+      subtitle: Center(child: Text('Prayers to Receive Christ Solo')),
       trailing: IconButton(
         icon: Icon(Icons.add),
         onPressed: () {
@@ -305,8 +314,8 @@ class PRCPartnerListTile extends StatelessWidget { // listtile for prc partner s
           print('partner prc - pressed');
         },
       ),
-      title: Text(appState.stats[7].toString()),
-      subtitle: Text('Prayers to Receive Christ with Partner'),
+      title: Center(child: Text(appState.stats[7].toString())),
+      subtitle: Center(child: Text('Prayers to Receive Christ with Partner')),
       trailing: IconButton(
         icon: Icon(Icons.add),
         onPressed: () {

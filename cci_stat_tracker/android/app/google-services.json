@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "986130466451",
+    "project_id": "cci-stat-tracking",
+    "storage_bucket": "cci-stat-tracking.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:986130466451:android:8589b614261018e7522f66",
+        "android_client_info": {
+          "package_name": "com.example.cci_stat_tracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHHszwr1Sum2Gj4Nz516huzvK9pRckPZM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
