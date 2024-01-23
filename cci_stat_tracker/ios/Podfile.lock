@@ -1,9 +1,8 @@
 PODS:
   - cloud_firestore (4.14.0):
-    - Firebase/CoreOnly (~> 10.18.0)
-    - Firebase/Firestore (~> 10.18.0)
+    - Firebase/Firestore (= 10.18.0)
     - firebase_core
-    - FlutterMacOS
+    - Flutter
     - nanopb (< 2.30910.0, >= 2.30908.0)
   - Firebase/CoreOnly (10.18.0):
     - FirebaseCore (= 10.18.0)
@@ -11,13 +10,13 @@ PODS:
     - Firebase/CoreOnly
     - FirebaseFirestore (~> 10.18.0)
   - firebase_core (2.24.2):
-    - Firebase/CoreOnly (~> 10.18.0)
-    - FlutterMacOS
+    - Firebase/CoreOnly (= 10.18.0)
+    - Flutter
   - FirebaseCore (10.18.0):
     - FirebaseCoreInternal (~> 10.0)
     - GoogleUtilities/Environment (~> 7.12)
     - GoogleUtilities/Logger (~> 7.12)
-  - FirebaseCoreInternal (10.19.0):
+  - FirebaseCoreInternal (10.20.0):
     - "GoogleUtilities/NSData+zlib (~> 7.8)"
   - FirebaseFirestore (10.18.0):
     - FirebaseFirestore/AutodetectLeveldb (= 10.18.0)
@@ -27,7 +26,7 @@ PODS:
   - FirebaseFirestore/Base (10.18.0)
   - FirebaseFirestore/WithLeveldb (10.18.0):
     - FirebaseFirestore/Base
-  - FlutterMacOS (1.0.0)
+  - Flutter (1.0.0)
   - GoogleUtilities/Environment (7.12.0):
     - PromisesObjC (< 3.0, >= 1.2)
   - GoogleUtilities/Logger (7.12.0):
@@ -41,10 +40,10 @@ PODS:
   - PromisesObjC (2.3.1)
 
 DEPENDENCIES:
-  - cloud_firestore (from `Flutter/ephemeral/.symlinks/plugins/cloud_firestore/macos`)
-  - firebase_core (from `Flutter/ephemeral/.symlinks/plugins/firebase_core/macos`)
+  - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
+  - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - FirebaseFirestore (from `https://github.com/invertase/firestore-ios-sdk-frameworks.git`, tag `10.18.0`)
-  - FlutterMacOS (from `Flutter/ephemeral`)
+  - Flutter (from `Flutter`)
 
 SPEC REPOS:
   trunk:
@@ -57,14 +56,14 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   cloud_firestore:
-    :path: Flutter/ephemeral/.symlinks/plugins/cloud_firestore/macos
+    :path: ".symlinks/plugins/cloud_firestore/ios"
   firebase_core:
-    :path: Flutter/ephemeral/.symlinks/plugins/firebase_core/macos
+    :path: ".symlinks/plugins/firebase_core/ios"
   FirebaseFirestore:
     :git: https://github.com/invertase/firestore-ios-sdk-frameworks.git
     :tag: 10.18.0
-  FlutterMacOS:
-    :path: Flutter/ephemeral
+  Flutter:
+    :path: Flutter
 
 CHECKOUT OPTIONS:
   FirebaseFirestore:
@@ -72,17 +71,17 @@ CHECKOUT OPTIONS:
     :tag: 10.18.0
 
 SPEC CHECKSUMS:
-  cloud_firestore: c24b3cd9294b9e8a94fe8d03b34c5b3339f40204
+  cloud_firestore: 73eece22ce25a0565238c283ee9990f1618d8063
   Firebase: 414ad272f8d02dfbf12662a9d43f4bba9bec2a06
-  firebase_core: a74ee8b3ab5f91ae6b73f4913eaca996c24458b6
+  firebase_core: 0af4a2b24f62071f9bf283691c0ee41556dcb3f5
   FirebaseCore: 2322423314d92f946219c8791674d2f3345b598f
-  FirebaseCoreInternal: b444828ea7cfd594fca83046b95db98a2be4f290
+  FirebaseCoreInternal: efeeb171ac02d623bdaefe121539939821e10811
   FirebaseFirestore: 584e3f563142f63d20e9ec9c505370d674d44eba
-  FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   GoogleUtilities: 0759d1a57ebb953965c2dfe0ba4c82e95ccc2e34
   nanopb: d4d75c12cd1316f4a64e3c6963f879ecd4b5e0d5
   PromisesObjC: c50d2056b5253dadbd6c2bea79b0674bd5a52fa4
 
-PODFILE CHECKSUM: 7f9b8fee74db3ee5544f593abb237c596a33a3b0
+PODFILE CHECKSUM: 10e74719bd2a9f79a4bb6a1cf014279320aa6c17
 
 COCOAPODS: 1.14.3
