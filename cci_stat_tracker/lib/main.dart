@@ -1,11 +1,12 @@
 // import 'package:english_words/english_words.dart';
 // DONT WORRY ABOUT DATE RANGES YET, JUST USE THE USER AS THE TOP LEVEL IN THE DATABASE AND GET THINGS READING/WRITING
 // ANGULAR/REACT WEBSITE TO INTERACT WITH DATABASE (JONAH)
-
+// trying to write data to firebase, not working... LOOK INTO DEFAULT FIREBASE OPTIONS (https://firebase.flutter.dev/docs/firestore/example)
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 
 Future<void> main() async {
@@ -37,12 +38,24 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
 
-   var stats = [0, 0, 0, 0, 0, 0, 0, 0]; // list of stats (init solo, init partner, sc solo, sc partner, etc...)
-
+  var stats = [0, 0, 0, 0, 0, 0, 0, 0]; // list of stats (init solo, init partner, sc solo, sc partner, etc...)
+  //FirebaseFirestore db = FirebaseFirestore.instance;
+  CollectionReference test = FirebaseFirestore.instance.collection('entries');
   
   // USE THIS AS THE METHOD TO CALL DATABASE, ETC
   void login() {
     print('user logged in');
+    
+    test.doc("WZEAIppxMYujbxZar0Ys").get().then((DocumentSnapshot documentSnapshot) {
+      print("inside function");
+      if (documentSnapshot.exists) {
+        print('Document data: ${documentSnapshot.data()}');
+      }
+      else {
+        print('Document does not exist...');
+      }
+    });
+    
     notifyListeners();
   }
 
@@ -76,12 +89,12 @@ class LoginPage extends StatelessWidget {
             // login button
             ElevatedButton(
               onPressed: () {
-              print('login pressed!');
-              appState.login();
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => UpdateStatsPage()),
-              );
+                print('login pressed!');
+                  appState.login();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => UpdateStatsPage()),
+                );
             },
             child: Text('Login'),
             )
@@ -132,6 +145,9 @@ class InitSoloListTile extends StatelessWidget { // listtile for init solo stat
         icon: Icon(Icons.add),
         onPressed: () {
           appState.incStat(0); // increment init solo
+          // db.collection("entries").doc("WZEAIppxMYujbxZar0Ys").update({"inits": appState.stats[0]}).then(
+          //   (value) => print("DocumentSnapshot successfully updated!"),
+          //   onError: (e) => print("Error updating document $e"));
           print('solo init + pressed');
         },
       ),
