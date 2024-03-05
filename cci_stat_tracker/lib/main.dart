@@ -7,6 +7,14 @@ import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:cci_stat_tracker/UpdateStats/init.dart';
+import 'package:cci_stat_tracker/UpdateStats/spir.dart';
+import 'package:cci_stat_tracker/UpdateStats/gc.dart';
+import 'package:cci_stat_tracker/UpdateStats/prc.dart';
+import 'package:cci_stat_tracker/UpdateStats/nmu.dart';
+import 'package:cci_stat_tracker/UpdateStats/phone_num.dart';
+import 'package:cci_stat_tracker/UpdateStats/hours.dart';
 
 
 Future<void> main() async {
@@ -40,13 +48,17 @@ class MyAppState extends ChangeNotifier {
 
   var stats = [0, 0, 0, 0, 0, 0, 0, 0]; // list of stats (init solo, init partner, sc solo, sc partner, etc...)
   //FirebaseFirestore db = FirebaseFirestore.instance;
-  CollectionReference test = FirebaseFirestore.instance.collection('entries');
+  final docRef = FirebaseFirestore.instance.collection('entries').doc("WZEAIppxMYujbxZar0Ys");
+  // docRef.snapshots().listen(
+  //   (event) => print("current data: ${event.data()}"),
+  //   onError: (error) => print("Listen failed: $error"),
+  // );
   
   // USE THIS AS THE METHOD TO CALL DATABASE, ETC
   void login() {
     print('user logged in');
     
-    test.doc("WZEAIppxMYujbxZar0Ys").get().then((DocumentSnapshot documentSnapshot) {
+    docRef.get().then((DocumentSnapshot documentSnapshot) {
       print("inside function");
       if (documentSnapshot.exists) {
         print('Document data: ${documentSnapshot.data()}');
@@ -93,7 +105,7 @@ class LoginPage extends StatelessWidget {
                   appState.login();
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => UpdateStatsPage()),
+                    MaterialPageRoute(builder: (context) => UserStats()),
                 );
             },
             child: Text('Login'),
@@ -105,241 +117,86 @@ class LoginPage extends StatelessWidget {
   }
 }
 
-class UpdateStatsPage extends StatelessWidget { // this page is where the team will input their stats while doing outreach
+// class UpdateStatsPage extends StatelessWidget { // this page is where the team will input their stats while doing outreach
+//   @override
+//   Widget build(BuildContext context) {
+//     // var appState = context.watch<MyAppState>();
+
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text("Update Stats")
+//       ),
+//       body: Center(
+//         child: ListView(
+//           children: [
+//             InitSoloListTile(), InitPartnerListTile(), SCSoloListTile(), SCPartnerListTile(), GCSoloListTile(), GCPartnerListTile(), PRCSoloListTile(), PRCPartnerListTile()
+//           ]
+//         ),
+//       )
+//     );
+//   }
+// }
+
+class UpdateStatsPage extends State<UserStats> { // this page is where the team will input their stats while doing outreach
+  final Stream<QuerySnapshot> _entriesStream =
+      FirebaseFirestore.instance.collection('entries').snapshots();
+  
   @override
   Widget build(BuildContext context) {
-    // var appState = context.watch<MyAppState>();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Update Stats")
-      ),
-      body: Center(
-        child: ListView(
-          children: [
-            InitSoloListTile(), InitPartnerListTile(), SCSoloListTile(), SCPartnerListTile(), GCSoloListTile(), GCPartnerListTile(), PRCSoloListTile(), PRCPartnerListTile()
-          ]
-        ),
-      )
+    return StreamBuilder<QuerySnapshot>(
+      stream: _entriesStream,
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return const Text('Something went wrong');
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Text("Loading");
+        }
+        
+        return Scaffold(
+          appBar: AppBar(
+            title: Text("Update Stats")
+          ),
+          body: Center(
+            child: ListView(
+              children: snapshot.data!.docs
+              .map((DocumentSnapshot document) {
+                Map<String, dynamic> data =
+                    document.data()! as Map<String, dynamic>;
+                return ListTile(
+                  title: Text(data['inits_solo'].toString()),
+                  subtitle: Text(data['hours_solo'].toString()),
+                );
+              })
+              .toList()
+              .cast(),
+            ),
+          )
+        );
+      }
     );
   }
 }
 
-class InitSoloListTile extends StatelessWidget { // listtile for init solo stat
-  const InitSoloListTile({Key? key}) : super(key: key);
-
+class UserStats extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    return ListTile(
-      leading: IconButton(
-        icon: Icon(Icons.remove),
-        onPressed: () {
-          appState.decStat(0); // decrement init solo
-          print('solo init - pressed');
-        },
-      ),
-      title: Center(child: Text(appState.stats[0].toString())),
-      subtitle: Center(child: Text('Initiations Solo')),
-      trailing: IconButton(
-        icon: Icon(Icons.add),
-        onPressed: () {
-          appState.incStat(0); // increment init solo
-          // db.collection("entries").doc("WZEAIppxMYujbxZar0Ys").update({"inits": appState.stats[0]}).then(
-          //   (value) => print("DocumentSnapshot successfully updated!"),
-          //   onError: (e) => print("Error updating document $e"));
-          print('solo init + pressed');
-        },
-      ),
-    );
-  }
+  UpdateStatsPage createState() => UpdateStatsPage();
 }
 
-class InitPartnerListTile extends StatelessWidget { // listtile for init partner stat
-  const InitPartnerListTile({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    return ListTile(
-      leading: IconButton(
-        icon: Icon(Icons.remove),
-        onPressed: () {
-          appState.decStat(1); // decrement init solo
-          print('partner init - pressed');
-        },
-      ),
-      title: Center(child: Text(appState.stats[1].toString())),
-      subtitle: Center(child: Text('Initiations with Partner')),
-      trailing: IconButton(
-        icon: Icon(Icons.add),
-        onPressed: () {
-          appState.incStat(1); // increment init solo
-          print('parnter init + pressed');
-        },
-      ),
-    );
-  }
-}
 
-class SCSoloListTile extends StatelessWidget { // listtile for sc solo stat
-  const SCSoloListTile({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    return ListTile(
-      leading: IconButton(
-        icon: Icon(Icons.remove),
-        onPressed: () {
-          appState.decStat(2); // increment init solo
-          print('solo sc - pressed');
-        },
-      ),
-      title: Center(child: Text(appState.stats[2].toString())),
-      subtitle: Center(child: Text('Spiritual Conversations Solo')),
-      trailing: IconButton(
-        icon: Icon(Icons.add),
-        onPressed: () {
-          appState.incStat(2); // increment init solo
-          print('solo sc + pressed');
-        },
-      ),
-    );
-  }
-}
 
-class SCPartnerListTile extends StatelessWidget { // listtile for sc partner stat
-  const SCPartnerListTile({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    return ListTile(
-      leading: IconButton(
-        icon: Icon(Icons.remove),
-        onPressed: () {
-          appState.decStat(3); // increment init solo
-          print('partner sc + pressed');
-        },
-      ),
-      title: Center(child: Text(appState.stats[3].toString())),
-      subtitle: Center(child: Text('Spiritual Conversations with Partner')),
-      trailing: IconButton(
-        icon: Icon(Icons.add),
-        onPressed: () {
-          appState.incStat(3); // increment init solo
-          print('partner sc + pressed');
-        },
-      ),
-    );
-  }
-}
 
-class GCSoloListTile extends StatelessWidget { // listtile for gc solo stat
-  const GCSoloListTile({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    return ListTile(
-      leading: IconButton(
-        icon: Icon(Icons.remove),
-        onPressed: () {
-          appState.decStat(4); // decrement gc solo
-          print('solo gc + pressed');
-        },
-      ),
-      title: Center(child: Text(appState.stats[4].toString())),
-      subtitle: Center(child: Text('Gospel Conversations Solo')),
-      trailing: IconButton(
-        icon: Icon(Icons.add),
-        onPressed: () {
-          appState.incStat(4); // increment gc solo
-          print('solo gc + pressed');
-        },
-      ),
-    );
-  }
-}
 
-class GCPartnerListTile extends StatelessWidget { // listtile for gc partner stat
-  const GCPartnerListTile({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    return ListTile(
-      leading: IconButton(
-        icon: Icon(Icons.remove),
-        onPressed: () {
-          appState.decStat(5); // decrement gc partner
-          print('partner gc - pressed');
-        },
-      ),
-      title: Center(child: Text(appState.stats[5].toString())),
-      subtitle: Center(child: Text('Gospel Conversations with Partner')),
-      trailing: IconButton(
-        icon: Icon(Icons.add),
-        onPressed: () {
-          appState.incStat(5); // increment gc partner
-          print('partner gc + pressed');
-        },
-      ),
-    );
-  }
-}
 
-class PRCSoloListTile extends StatelessWidget { // listtile for prc solo stat
-  const PRCSoloListTile({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    return ListTile(
-      leading: IconButton(
-        icon: Icon(Icons.remove),
-        onPressed: () {
-          appState.decStat(6); // decrement prc solo
-          print('solo prc - pressed');
-        },
-      ),
-      title: Center(child: Text(appState.stats[6].toString())),
-      subtitle: Center(child: Text('Prayers to Receive Christ Solo')),
-      trailing: IconButton(
-        icon: Icon(Icons.add),
-        onPressed: () {
-          appState.incStat(6); // increment prc solo
-          print('solo prc + pressed');
-        },
-      ),
-    );
-  }
-}
 
-class PRCPartnerListTile extends StatelessWidget { // listtile for prc partner stat
-  const PRCPartnerListTile({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    return ListTile(
-      leading: IconButton(
-        icon: Icon(Icons.remove),
-        onPressed: () {
-          appState.decStat(7); // decrement prc partner
-          print('partner prc - pressed');
-        },
-      ),
-      title: Center(child: Text(appState.stats[7].toString())),
-      subtitle: Center(child: Text('Prayers to Receive Christ with Partner')),
-      trailing: IconButton(
-        icon: Icon(Icons.add),
-        onPressed: () {
-          appState.incStat(7); // increment prc partner
-          print('partner prc + pressed');
-        },
-      ),
-    );
-  }
-}
+
+
