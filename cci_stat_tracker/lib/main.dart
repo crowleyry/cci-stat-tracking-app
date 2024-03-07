@@ -15,6 +15,7 @@ import 'package:cci_stat_tracker/UpdateStats/prc.dart';
 import 'package:cci_stat_tracker/UpdateStats/nmu.dart';
 import 'package:cci_stat_tracker/UpdateStats/phone_num.dart';
 import 'package:cci_stat_tracker/UpdateStats/hours.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 
 Future<void> main() async {
@@ -38,7 +39,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
         ),
-        home: LoginPage(),
+        home: LoginPageState(),
       ),
     );
   }
@@ -61,6 +62,23 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> createAccount(var emailAddress, var password) async {
+    print('user is creating account...');
+
+    try {
+      final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: emailAddress, password: password);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        print('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        print('The account already exists for that email.');
+      }
+    } catch (e) {
+      print(e);
+    }
+
+  }
+
   void incStat(var theStat) { // increment specific stat in stats list
     stats[theStat]++;
     notifyListeners();
@@ -74,7 +92,36 @@ class MyAppState extends ChangeNotifier {
   
 }
 
-class LoginPage extends StatelessWidget {
+class LoginPageState extends StatefulWidget {
+  const LoginPageState({super.key});
+
+  @override
+  State<LoginPageState> createState() => LoginPage();
+}
+
+class CreateAccountPageState extends StatefulWidget {
+  const CreateAccountPageState({super.key});
+
+  @override
+  State<CreateAccountPageState> createState() => CreateAccountPage();
+}
+
+class LoginPage extends State<LoginPageState> {
+  final emailController = TextEditingController();
+  final passController = TextEditingController();
+
+  @override
+  void emailDispose() {
+    emailController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void passDispose() {
+    passController.dispose();
+    super.dispose();
+  }
+  
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
@@ -85,8 +132,20 @@ class LoginPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text('Welcome to CCI Stat Tracker!'),
-            Text('Username: '),
-            Text('Password: '),
+            TextField(
+              controller: emailController,
+              decoration: InputDecoration(
+                labelText: 'Email',
+                hintText: 'Enter your CCI email',
+              ),
+            ),
+            TextField(
+              controller: passController,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                hintText: 'Enter your password',
+              ),
+            ),
       
             // login button
             ElevatedButton(
@@ -99,6 +158,15 @@ class LoginPage extends StatelessWidget {
                 );
             },
             child: Text('Login'),
+            ),
+            ElevatedButton(
+              child: Text('Create Account'),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => CreateAccountPageState()),
+                );
+              },
             )
           ],
         ),
@@ -107,27 +175,101 @@ class LoginPage extends StatelessWidget {
   }
 }
 
-// class UpdateStatsPage extends StatelessWidget { // this page is where the team will input their stats while doing outreach
-//   @override
-//   Widget build(BuildContext context) {
-//     // var appState = context.watch<MyAppState>();
+class CreateAccountPage extends State<CreateAccountPageState> {
+  final emailController = TextEditingController();
+  final passController = TextEditingController();
+  final passAgainController = TextEditingController();
 
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text("Update Stats")
-//       ),
-//       body: Center(
-//         child: ListView(
-//           children: [
-//             InitSoloListTile(), InitPartnerListTile(), SCSoloListTile(), SCPartnerListTile(), GCSoloListTile(), GCPartnerListTile(), PRCSoloListTile(), PRCPartnerListTile()
-//           ]
-//         ),
-//       )
-//     );
-//   }
-// }
+  @override
+  void emailDispose() {
+    emailController.dispose();
+    super.dispose();
+  }
 
-enum ButtonItems { Solo, Partner}
+  @override
+  void passDispose() {
+    passController.dispose();
+    super.dispose();
+  }
+  @override
+  void passAgainDispose() {
+    passAgainController.dispose();
+    super.dispose();
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Create Account'),
+            TextField(
+              controller: emailController,
+              decoration: InputDecoration(
+                labelText: 'Email',
+                hintText: 'Use your CCI email',
+              ),
+            ),
+            TextField(
+              controller: passController,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                hintText: 'Enter your password',
+              ),
+            ),
+            TextField(
+              controller: passAgainController,
+              decoration: InputDecoration(
+                labelText: 'Re-type Password',
+                hintText: 'Enter your password again',
+              ),
+            ),
+            // login button
+            ElevatedButton(
+              onPressed: () {
+                print('submit pressed!');
+                if (passController.text != passAgainController.text) {
+                  print('passwords dont match');
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        content: Text('Passwords must match.'),
+                        actions: [
+                          TextButton(
+                            child: Text('Done'),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => CreateAccountPageState()),
+                              );
+                            }
+                          )
+                        ],
+                      );
+                    },
+                  );
+                }
+                else {
+                  appState.createAccount(emailController.text, passController.text);
+                  appState.login();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => UserStats()),
+                );
+                }
+            },
+            child: Text('Submit'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 
 class UpdateStatsPage extends State<UserStats> { // this page is where the team will input their stats while doing outreach
