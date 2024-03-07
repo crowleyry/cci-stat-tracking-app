@@ -48,7 +48,7 @@ class MyAppState extends ChangeNotifier {
 
   var stats = [0, 0, 0, 0, 0, 0, 0, 0]; // list of stats (init solo, init partner, sc solo, sc partner, etc...)
   //FirebaseFirestore db = FirebaseFirestore.instance;
-  final docRef = FirebaseFirestore.instance.collection('entries').doc("WZEAIppxMYujbxZar0Ys");
+  //final docRef = FirebaseFirestore.instance.collection('entries').doc("WZEAIppxMYujbxZar0Ys");
   // docRef.snapshots().listen(
   //   (event) => print("current data: ${event.data()}"),
   //   onError: (error) => print("Listen failed: $error"),
@@ -57,16 +57,6 @@ class MyAppState extends ChangeNotifier {
   // USE THIS AS THE METHOD TO CALL DATABASE, ETC
   void login() {
     print('user logged in');
-    
-    docRef.get().then((DocumentSnapshot documentSnapshot) {
-      print("inside function");
-      if (documentSnapshot.exists) {
-        print('Document data: ${documentSnapshot.data()}');
-      }
-      else {
-        print('Document does not exist...');
-      }
-    });
     
     notifyListeners();
   }
@@ -137,9 +127,15 @@ class LoginPage extends StatelessWidget {
 //   }
 // }
 
+enum ButtonItems { Solo, Partner}
+
+
 class UpdateStatsPage extends State<UserStats> { // this page is where the team will input their stats while doing outreach
   final Stream<QuerySnapshot> _entriesStream =
       FirebaseFirestore.instance.collection('entries').snapshots();
+  
+  final entriesRef = FirebaseFirestore.instance.collection('entries');
+
   
   @override
   Widget build(BuildContext context) {
@@ -166,8 +162,69 @@ class UpdateStatsPage extends State<UserStats> { // this page is where the team 
                 Map<String, dynamic> data =
                     document.data()! as Map<String, dynamic>;
                 return ListTile(
-                  title: Text(data['inits_solo'].toString()),
-                  subtitle: Text(data['hours_solo'].toString()),
+                  // title: Text(data['inits_solo'].toString()),
+                  // subtitle: Text(data['hours_solo'].toString()),
+                  leading: PopupMenuButton(
+                    icon: Icon(Icons.remove),
+                    itemBuilder: (BuildContext context) => [
+                      PopupMenuItem(
+                        value: 'so',
+                        child: TextButton(
+                          child: Text("Solo"),
+                          onPressed: () {
+                            // decrement value in database
+                            entriesRef.doc(document.id).update(
+                              {"Solo": FieldValue.increment(-1)},
+                            );
+
+                          },
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'pa',
+                        child: TextButton(
+                          child: Text('Partner'),
+                          onPressed: () {
+                            // decrement value in database
+                            entriesRef.doc(document.id).update(
+                              {"Partner": FieldValue.increment(-1)},
+                            );
+                          },
+                        ),
+                      )
+                    ],
+                  ),
+                  title: Center(child: Text('Solo: ' + data['Solo'].toString() + ', Partner: ' + data['Partner'].toString())),
+                  subtitle: Center(child: Text(document.id.toString())),
+                  trailing: PopupMenuButton(
+                    icon: Icon(Icons.add),
+                    itemBuilder: (BuildContext context) => [
+                      PopupMenuItem(
+                        value: 'so',
+                        child: TextButton(
+                          child: Text("Solo"),
+                          onPressed: () {
+                            // increment value in database
+                            entriesRef.doc(document.id).update(
+                              {"Solo": FieldValue.increment(1)},
+                            );
+                          },
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'pa',
+                        child: TextButton(
+                          child: Text('Partner'),
+                          onPressed: () {
+                            // increment value in database
+                            entriesRef.doc(document.id).update(
+                              {"Partner": FieldValue.increment(1)},
+                            );
+                          },
+                        ),
+                      )
+                    ],
+                  ),
                 );
               })
               .toList()
