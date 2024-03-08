@@ -2,6 +2,8 @@
 // DONT WORRY ABOUT DATE RANGES YET, JUST USE THE USER AS THE TOP LEVEL IN THE DATABASE AND GET THINGS READING/WRITING
 // ANGULAR/REACT WEBSITE TO INTERACT WITH DATABASE (JONAH)
 // trying to write data to firebase, not working... LOOK INTO DEFAULT FIREBASE OPTIONS (https://firebase.flutter.dev/docs/firestore/example)
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -56,17 +58,44 @@ class MyAppState extends ChangeNotifier {
   // );
   
   // USE THIS AS THE METHOD TO CALL DATABASE, ETC
-  void login() {
+  Future<void> login(var emailAddress, var password) async {
     print('user logged in');
     
+    try {
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailAddress,
+        password: password
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('No user found with that email.');
+      } else if (e.code == 'wrong-password'){
+        print('Wrong password provided for that user.');
+      }
+    }
+
     notifyListeners();
   }
 
   Future<void> createAccount(var emailAddress, var password) async {
     print('user is creating account...');
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    final stats = <String, dynamic>{
+      "Solo" : 0, 
+      "Partner" : 0
+    };
 
     try {
       final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: emailAddress, password: password);
+      db.collection(emailAddress.toString()).doc("Initiations").set(stats);
+      print("created init doc");
+      db.collection(emailAddress.toString()).doc("Spiritual Conversations").set(stats);
+      db.collection(emailAddress.toString()).doc("Gospel Conversations").set(stats);
+      db.collection(emailAddress.toString()).doc("Prayers to Receive Christ").set(stats);
+      db.collection(emailAddress.toString()).doc("New Meetups").set(stats);
+      db.collection(emailAddress.toString()).doc("Phone Numbers").set(stats);
+      db.collection(emailAddress.toString()).doc("Hours").set(stats);
+      login(emailAddress, password);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         print('The password provided is too weak.');
@@ -76,7 +105,12 @@ class MyAppState extends ChangeNotifier {
     } catch (e) {
       print(e);
     }
+    notifyListeners();
+  }
 
+  Future<void> signOut() async {
+    await FirebaseAuth.instance.signOut();
+    notifyListeners();
   }
 
   void incStat(var theStat) { // increment specific stat in stats list
@@ -109,7 +143,6 @@ class CreateAccountPageState extends StatefulWidget {
 class LoginPage extends State<LoginPageState> {
   final emailController = TextEditingController();
   final passController = TextEditingController();
-
   @override
   void emailDispose() {
     emailController.dispose();
@@ -125,7 +158,7 @@ class LoginPage extends State<LoginPageState> {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-
+    
     return Scaffold(
       body: Center(
         child: Column(
@@ -151,7 +184,7 @@ class LoginPage extends State<LoginPageState> {
             ElevatedButton(
               onPressed: () {
                 print('login pressed!');
-                  appState.login();
+                  appState.login(emailController.text, passController.text);
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => UserStats()),
@@ -179,6 +212,7 @@ class CreateAccountPage extends State<CreateAccountPageState> {
   final emailController = TextEditingController();
   final passController = TextEditingController();
   final passAgainController = TextEditingController();
+  final nameController = TextEditingController();
 
   @override
   void emailDispose() {
@@ -196,16 +230,31 @@ class CreateAccountPage extends State<CreateAccountPageState> {
     passAgainController.dispose();
     super.dispose();
   }
+  @override
+  void nameDispose() {
+    nameController.dispose();
+    super.dispose();
+  }
   
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Welcome!'),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text('Create Account'),
+            // TextField(
+            //   controller: nameController,
+            //   decoration: InputDecoration(
+            //     labelText: 'First and Last Name',
+            //     hintText: 'Enter your name',
+            //   ),
+            // ),
             TextField(
               controller: emailController,
               decoration: InputDecoration(
@@ -227,6 +276,7 @@ class CreateAccountPage extends State<CreateAccountPageState> {
                 hintText: 'Enter your password again',
               ),
             ),
+            
             // login button
             ElevatedButton(
               onPressed: () {
@@ -255,7 +305,7 @@ class CreateAccountPage extends State<CreateAccountPageState> {
                 }
                 else {
                   appState.createAccount(emailController.text, passController.text);
-                  appState.login();
+                  //appState.login();
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => UserStats()),
@@ -273,14 +323,26 @@ class CreateAccountPage extends State<CreateAccountPageState> {
 
 
 class UpdateStatsPage extends State<UserStats> { // this page is where the team will input their stats while doing outreach
-  final Stream<QuerySnapshot> _entriesStream =
-      FirebaseFirestore.instance.collection('entries').snapshots();
+  //var user = FirebaseAuth.instance.currentUser;
   
-  final entriesRef = FirebaseFirestore.instance.collection('entries');
+  // final Stream<QuerySnapshot> _entriesStream =
+  //     FirebaseFirestore.instance.collection(user.uid).snapshots();
+  
+  //final entriesRef = FirebaseFirestore.instance.collection('entries');
 
   
   @override
   Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var theUser;
+    if (FirebaseAuth.instance.currentUser != null) {
+      theUser = FirebaseAuth.instance.currentUser?.email;
+    }
+    final Stream<QuerySnapshot> _entriesStream =
+       FirebaseFirestore.instance.collection(theUser.toString()).snapshots();
+
+    final entriesRef = FirebaseFirestore.instance.collection(theUser.toString());
+
 
     return StreamBuilder<QuerySnapshot>(
       stream: _entriesStream,
@@ -295,7 +357,20 @@ class UpdateStatsPage extends State<UserStats> { // this page is where the team 
         
         return Scaffold(
           appBar: AppBar(
-            title: Text("Update Stats")
+            title: Text("Welcome, " + theUser.toString()),
+            automaticallyImplyLeading: false,
+            actions: [
+              TextButton(
+                child: Text('Log Out'),
+                onPressed: () {
+                  appState.signOut();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginPageState()),
+                );
+                },
+              )
+            ]
           ),
           body: Center(
             child: ListView(
