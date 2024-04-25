@@ -18,6 +18,8 @@ import 'package:cci_stat_tracker/UpdateStats/nmu.dart';
 import 'package:cci_stat_tracker/UpdateStats/phone_num.dart';
 import 'package:cci_stat_tracker/UpdateStats/hours.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
+
 
 
 Future<void> main() async {
@@ -57,7 +59,6 @@ class MyAppState extends ChangeNotifier {
   //   onError: (error) => print("Listen failed: $error"),
   // );
   
-  // USE THIS AS THE METHOD TO CALL DATABASE, ETC
   Future<void> login(var emailAddress, var password) async {
     print('user logged in');
     
@@ -79,22 +80,25 @@ class MyAppState extends ChangeNotifier {
 
   Future<void> createAccount(var emailAddress, var password) async {
     print('user is creating account...');
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    final stats = <String, dynamic>{
-      "Solo" : 0, 
-      "Partner" : 0
+    // final the_stats = <String, dynamic>{
+    //   "Solo" : 0, 
+    //   "Partner" : 0
+    // };
+    Map<String, Map<String, dynamic>> the_stats = {
+      mostRecentMonday(): {'Solo': 0, 'Partner': 0}
     };
+    FirebaseFirestore db = FirebaseFirestore.instance;
 
     try {
       final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: emailAddress, password: password);
-      db.collection(emailAddress.toString()).doc("Initiations").set(stats);
+      db.collection(emailAddress.toString()).doc("Initiations").set(the_stats);
       print("created init doc");
-      db.collection(emailAddress.toString()).doc("Spiritual Conversations").set(stats);
-      db.collection(emailAddress.toString()).doc("Gospel Conversations").set(stats);
-      db.collection(emailAddress.toString()).doc("Prayers to Receive Christ").set(stats);
-      db.collection(emailAddress.toString()).doc("New Meetups").set(stats);
-      db.collection(emailAddress.toString()).doc("Phone Numbers").set(stats);
-      db.collection(emailAddress.toString()).doc("Hours").set(stats);
+      db.collection(emailAddress.toString()).doc("Spiritual Conversations").set(the_stats);
+      db.collection(emailAddress.toString()).doc("Gospel Conversations").set(the_stats);
+      db.collection(emailAddress.toString()).doc("Prayers to Receive Christ").set(the_stats);
+      db.collection(emailAddress.toString()).doc("New Meetups").set(the_stats);
+      db.collection(emailAddress.toString()).doc("Phone Numbers").set(the_stats);
+      db.collection(emailAddress.toString()).doc("Hours").set(the_stats);
       login(emailAddress, password);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
@@ -112,6 +116,44 @@ class MyAppState extends ChangeNotifier {
     await FirebaseAuth.instance.signOut();
     notifyListeners();
   }
+
+
+  String mostRecentMonday() { // returns formatted string of the date of the most recent Monday according to local timezone
+    DateTime now = DateTime.now();
+    DateTime monday = now.subtract(Duration(days: now.weekday - 1));
+    return DateFormat('yyyy-MM-dd').format(monday);
+  }
+
+  String getNextMonday() {
+    DateTime now = DateTime.now();
+    int daysUntilMonday = DateTime.monday - now.weekday;
+    if (daysUntilMonday <= 0) {
+      daysUntilMonday += 7; // If today is Monday or later, move to next Monday
+    }
+    DateTime nextMonday = now.add(Duration(days: daysUntilMonday));
+    String formattedDate = DateFormat('yyyy-MM-dd').format(nextMonday);
+    return formattedDate;
+}
+
+  Future<void> isItSunday(var emailAddress) async {
+    
+    print('creating next Monday data field');
+    Map<String, Map<String, dynamic>> the_stats = {
+      getNextMonday(): {'Solo': 0, 'Partner': 0}
+    };
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    
+    if (DateTime.now() == DateTime.sunday) {
+      db.collection(emailAddress.toString()).doc("Initiations").set(the_stats);
+      db.collection(emailAddress.toString()).doc("Spiritual Conversations").set(the_stats);
+      db.collection(emailAddress.toString()).doc("Gospel Conversations").set(the_stats);
+      db.collection(emailAddress.toString()).doc("Prayers to Receive Christ").set(the_stats);
+      db.collection(emailAddress.toString()).doc("New Meetups").set(the_stats);
+      db.collection(emailAddress.toString()).doc("Phone Numbers").set(the_stats);
+      db.collection(emailAddress.toString()).doc("Hours").set(the_stats);
+    }
+  }
+
 
   void incStat(var theStat) { // increment specific stat in stats list
     stats[theStat]++;
@@ -335,14 +377,16 @@ class UpdateStatsPage extends State<UserStats> { // this page is where the team 
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var theUser;
+    String thisWeek = appState.mostRecentMonday();
+
     if (FirebaseAuth.instance.currentUser != null) {
       theUser = FirebaseAuth.instance.currentUser?.email;
+      appState.isItSunday(theUser);
     }
     final Stream<QuerySnapshot> _entriesStream =
        FirebaseFirestore.instance.collection(theUser.toString()).snapshots();
 
     final entriesRef = FirebaseFirestore.instance.collection(theUser.toString());
-
 
     return StreamBuilder<QuerySnapshot>(
       stream: _entriesStream,
@@ -391,7 +435,7 @@ class UpdateStatsPage extends State<UserStats> { // this page is where the team 
                           onPressed: () {
                             // decrement value in database
                             entriesRef.doc(document.id).update(
-                              {"Solo": FieldValue.increment(-1)},
+                              {'$thisWeek.Solo': FieldValue.increment(-1)},
                             );
 
                           },
@@ -404,14 +448,14 @@ class UpdateStatsPage extends State<UserStats> { // this page is where the team 
                           onPressed: () {
                             // decrement value in database
                             entriesRef.doc(document.id).update(
-                              {"Partner": FieldValue.increment(-1)},
+                              {'$thisWeek.Partner': FieldValue.increment(-1)},
                             );
                           },
                         ),
                       )
                     ],
                   ),
-                  title: Center(child: Text('Solo: ' + data['Solo'].toString() + ', Partner: ' + data['Partner'].toString())),
+                  title: Center(child: Text('Solo: ${data[thisWeek]['Solo']}, Partner: ${data[thisWeek]['Partner']}')),
                   subtitle: Center(child: Text(document.id.toString())),
                   trailing: PopupMenuButton(
                     icon: Icon(Icons.add),
@@ -423,7 +467,7 @@ class UpdateStatsPage extends State<UserStats> { // this page is where the team 
                           onPressed: () {
                             // increment value in database
                             entriesRef.doc(document.id).update(
-                              {"Solo": FieldValue.increment(1)},
+                              {'$thisWeek.Solo': FieldValue.increment(1)},
                             );
                           },
                         ),
@@ -435,7 +479,7 @@ class UpdateStatsPage extends State<UserStats> { // this page is where the team 
                           onPressed: () {
                             // increment value in database
                             entriesRef.doc(document.id).update(
-                              {"Partner": FieldValue.increment(1)},
+                              {'$thisWeek.Partner': FieldValue.increment(1)},
                             );
                           },
                         ),
